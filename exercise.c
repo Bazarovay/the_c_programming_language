@@ -1,95 +1,50 @@
-
 #include <stdio.h>
-#define MAXLINE 1000
+#define MAXLINE 1000 /* maximum input line size */
 
-
-int getlines(char line[], int maxline);
-void copy(char to[], char from[]);
-
-void reverse(char reversed[], char orig[], int size);
-
-
-/* print the longest input */
+int max;
+char line[MAXLINE];
+char longest[MAXLINE]; /* maximum length seen so far */
+/* current input line */
+/* longest line saved here */
+int getlines(void);
+void copy(void);
+/* print longest input line; specialized version */
 int main() {
   int len;
-  int max;
-  char line[MAXLINE];
-  char longest[MAXLINE];
-  char reversed[MAXLINE];
+  extern int max;
+  extern char longest[];
   max = 0;
-  while ((len = getlines(line, MAXLINE)) > 0) {
-    // printf("LENGHT SDADASDASD WAS %d\n", len);
-    if (len > 10) /* there was a line */
-    printf("Longer than 10 %s | size:  %d", line, len);
-
+  while ((len = getlines()) > 0)
     if (len > max) {
       max = len;
-      copy(longest, line);
+      copy();
     }
-  }
 
-  /* there was a line */
-  if (max > 0) {
-    printf("Longest: %s \n size:  %d", longest, max);
-    reverse(longest, longest, max);
-    printf("reversed:  %s \n", longest);
-  }
+  if (max > 0) /* there was a line */
+    printf("%s", longest);
   return 0;
 }
 
-/* getlines: read a line into s, return length */
-int getlines(char s[],int lim) {
-  int c, i, bcount;
-  char blankandtab[lim];
-  bcount = 0;
-  for (i=0; i < lim-1 && (c=getchar())!=EOF && c!='\n'; ++i) {
-    if (c == ' ' || c == '\t') {
-      blankandtab[bcount] = c;
-      ++bcount;
-    } else {
-      for (int n = 0; n < bcount; ++n) {
-        s[i] = blankandtab[n];
-        blankandtab[n] = 0;
-      }
-      bcount = 0;
-    }
-    s[i] = c;
-  }
-
+/* getlines: specialized version */
+int getlines(void) {
+  int c, i;
+  extern char line[];
+  for (i = 0; i < (MAXLINE - 1) && (c = getchar()) != EOF && c != '\n'; ++i)
+    line[i] = c;
 
   if (c == '\n') {
-    printf("%s %d %d\n", "Blank + Index : ", bcount, i);
-    i = i - bcount;
-    if (i > 0) {
-      s[i] = c;
-      ++i;
-    }
+    line[i] = c;
+    ++i;
   }
-
-  s[i] = '\0';
+  line[i] = '\0';
   return i;
 }
 
-/* copy: copy 'from' into 'to'; assume to is big enough */
-void copy(char to[], char from[]) {
+/* copy: specialized version */
+void copy(void) {
   int i;
+  extern char line[], longest[];
   i = 0;
-  while ((to[i] = from[i]) != '\0')
-  ++i;
-}
-
-
-/* reverse: reverse orig to reversed */
-void reverse(char newarray[], char original[], int size) {
-  int i;
-  size = size -2; // removing /n and /0;
-  for (i = size; original[size - i] != '\n'; --i) {
-    if (original[i] != '\n' && original[i] != '\0') {
-      printf("GET HTE VALUE %d\n", size - i);
-      putchar(original[i]);
-      newarray[size - i] = original[i];
-    }
-  }
-  newarray[++size] = '\n';
-  newarray[++size] = '\0';
+  while ((longest[i] = line[i]) != '\0')
+    ++i;
 }
